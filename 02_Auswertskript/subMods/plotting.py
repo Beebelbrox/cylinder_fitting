@@ -8,7 +8,9 @@ Created on Thu Nov 25 10:36:50 2021
 import numpy as np
 import matplotlib.pyplot as plt 
 from matplotlib import gridspec
+from scipy.interpolate import griddata
 from . import evaluation
+
 
 class plotter:
     def __init__(self, plottinginputs ):
@@ -311,5 +313,45 @@ class plotter:
         fileName = str(fPath) + '/longDeviat_' + str(angle) + '.svg'
         plt.savefig(fileName, dpi=300)
         plt.show()
+    
+    def SurfPlotUnwrapped(self, nPhi = 10, nz = 10, base = 'bestFit'):
+        
+        print('###')
+        print('### start plotting unwrapped shape (surface) ###')
+        print('###')
+        
+                
+        if base == 'bestFit':
+            h = self.unwrapped['h_reference']
+            r = self.fittingParams[6]
+        elif base == 'guess':
+            h = self.unwrapped['h_target']
+            r = self.D_guess/2.0
+        
+        
+        # define regular grid to interpolate scanned data on 
+        z_max = max(self.unwrapped['mesh'].y)-5
+        z_min = min(self.unwrapped['mesh'].y)+5
+        
+        x_max = max(self.unwrapped['mesh'].x)*r*0.98
+        x_min = min(self.unwrapped['mesh'].x)*r*0.98
+        
+        px, py = np.linspace(x_min, x_max, nPhi), np.linspace(z_min, z_max, nz)
+        px, py = np.meshgrid(px, py)
+        
+        # interpolate
+        x_scan = self.unwrapped['mesh'].x*r
+        y_scan = self.unwrapped['mesh'].y
+        z_scan = np.array(h)
+        
+        pz = griddata((x_scan, y_scan), z_scan, (px, py), method = 'cubic')
+        
+        
+        fig = plt.figure(figsize = (16,8))
+        ax1 = fig.add_subplot(111, projection = '3d')
+        ax1.plot_surface(px,py,pz, cmap = 'Spectral')       # interpolated scan
+        plt.show()
+        
+
 
         

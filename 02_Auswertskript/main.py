@@ -23,7 +23,7 @@ import pathlib
 ##############################################################################
 
 # name of stl file in folder 01_STL_Daten
-stlFilename = 'P3-nachher-STL.stl'
+stlFilename = 'MeshSample.stl'
 
 # define directory names:
 currentDir = pathlib.Path.cwd()
@@ -55,14 +55,14 @@ dx = (x_min-x_max)
 dy = (y_min-y_max)
 dz = (z_min-z_max)
 
-# compute best fir cylinder 
+# compute best for cylinder 
 
-diam_guess = 800
+diam_guess = 200
 rotation   = 155
 zylFitter.computeBestFitZylinder(diam_guess, [x0,y0,z0], [dx,dy,dz], 
                                  rot_z_deg = rotation)#, reverse = True)
 
-zylFitter.removePointsBetween(1500, 2500)
+#zylFitter.removePointsBetween(1500, 2500)
 
 ##############################################################################
 #                                                                            #
@@ -70,22 +70,13 @@ zylFitter.removePointsBetween(1500, 2500)
 #                                                                            #
 ##############################################################################
 
-delBot = -80  # bottom limit of color band 
-delTop =  20  # top limit of color band
+delBot = -5  # bottom limit of color band 
+delTop =  5  # top limit of color band
 sketcher = pl.plotter(zylFitter.getPlottingInputs())
+
 
 sketcher.plotFitting(base = 'guess', minTol = delBot, maxTol=delTop, nStep=10, 
                      fPath = imgDir)
-
 sketcher.plotUnwrapped(base = 'guess', minTol = delBot, maxTol=delTop, 
                        fPath = imgDir, nStep = 10, reverseSamples=True)
-sketcher.plotCrossSection(d_nom = 800, height = 2100, cuttingWidth = 1
-                          ,fPath = imgDir)  
-sketcher.plotLongSection( angle =   0, cuttingAngle = 1, amplification = 1,
-                         fPath = imgDir)
-sketcher.plotLongSection( angle =  90, cuttingAngle = 1, amplification = 1,
-                         fPath = imgDir)
-sketcher.plotLongSection( angle = 180, cuttingAngle = 1, amplification = 1,
-                         fPath = imgDir)
-sketcher.plotLongSection( angle = -90, cuttingAngle = 1, amplification = 1,
-                         fPath = imgDir)
+sketcher.SurfPlotUnwrapped(nPhi = 200, nz = 50)
